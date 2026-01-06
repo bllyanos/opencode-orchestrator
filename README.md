@@ -4,7 +4,7 @@ A collection of specialized AI agents for [OpenCode](https://opencode.ai) design
 
 ## Overview
 
-This repository contains a set of custom OpenCode agents that work together to build complete web applications from concept to implementation. The agents follow a structured workflow that handles everything from requirements gathering to deployment-ready code.
+This repository contains a set of custom OpenCode agents that work together to build complete web applications from concept to implementation. The agents follow a structured, Agile-inspired workflow that handles everything from requirements gathering to deployment-ready code, with strict user-guided checkpoints.
 
 **Tech Stack**: Vite + React + Tailwind CSS (frontend), Express + TypeScript + SQLite (backend)
 
@@ -18,9 +18,9 @@ Learn more about OpenCode agents: https://opencode.ai/docs/agents/
 
 ### Primary Agent
 
-**orchestrator** - The main coordinator that manages all subagents and drives the development workflow from start to finish.
+**orchestrator** - The main coordinator that manages all subagents. It follows a strict "Stop-and-Wait" protocol, never executing a task without explicit user confirmation.
 - **Mode**: `primary`
-- **Purpose**: Orchestrates the entire development lifecycle by delegating tasks to specialized subagents
+- **Purpose**: Orchestrates the development lifecycle via Sprint Planning and Task Execution.
 
 ### Subagents
 
@@ -29,8 +29,9 @@ The orchestrator manages these specialized agents:
 1. **problem_expander** - Translates high-level user requests into detailed, comprehensive problem statements
    - Creates: `agent_works/PROBLEM.md`
 
-2. **tasker** - Breaks down requirements into actionable, granular tasks with clear checkboxes
-   - Creates: `agent_works/TASKS.md`
+2. **tasker** - Manages the project backlog and generates detailed sprint plans.
+   - Creates: `agent_works/TASKS.md` (Global Backlog)
+   - Creates: `agent_works/SPRINT_XX.md` (Active Execution Plan)
 
 3. **architect** - Designs the technical foundation of the application
    - Creates: `agent_works/DB.md` (database schema)
@@ -46,9 +47,8 @@ The orchestrator manages these specialized agents:
 6. **scripter** - Creates utility scripts for running, testing, and debugging the application
    - Updates `package.json` scripts or creates standalone shell scripts
 
-7. **archiver** - Archives completed project phases to keep the workspace focused
-   - Moves completed work to `agent_works/archives/part_N/`
-   - Refreshes active work files with only pending tasks
+7. **archiver** - Archives completed sprints to keep the workspace focused
+   - Moves completed sprints to `agent_works/archives/part_N/`
 
 ## Installation
 
@@ -83,16 +83,22 @@ I want to build a task management app with user authentication,
 project boards, and real-time collaboration features.
 ```
 
-The orchestrator will guide you through clarification questions, then automatically:
-- Expand your request into a detailed problem statement
-- Break it down into actionable tasks
-- Design the database, frontend, and API architecture
-- Implement the backend and frontend
-- Create necessary utility scripts
+The orchestrator will guide you through:
+1. **Clarification**: Asking questions to refine the idea.
+2. **Backlog Creation**: Generating `agent_works/TASKS.md`.
+3. **Sprint Planning**: Asking you which backlog items to tackle first.
+4. **Execution**: Creating `agent_works/SPRINT_01.md` and executing tasks one by one, waiting for your approval after each step.
 
 ### Continuing an Existing Project
 
-If `agent_works/` already exists, the orchestrator will ask for confirmation before continuing and may suggest archiving completed work to keep the workspace focused.
+If `agent_works/SPRINT_XX.md` exists, the orchestrator will read the active sprint and propose the next pending task.
+
+```
+Next Task: [BE-01] Setup Express Server
+Assignee: @backend_developer
+Description: Initialize the server with Helmet and CORS.
+Shall I proceed?
+```
 
 ### Invoking Specific Agents
 
@@ -108,16 +114,27 @@ You can also invoke individual subagents using @ mentions:
 
 ## Workflow
 
-The standard full-stack development workflow follows these phases:
+The workflow follows an Agile Sprint model:
 
-1. **Clarification** - Orchestrator asks questions to understand requirements
-2. **Requirement Expansion** - Problem statement created
-3. **Task Breakdown** - Detailed task list generated
-4. **Technical Architecture** - Database, frontend, and API designed
-5. **Backend Implementation** - Server-side code and database implemented
-6. **Frontend Implementation** - User interface built and integrated
-7. **Utility Scripting** - Helper scripts created
-8. **Checkpointing & Archiving** - Completed work archived, workspace refreshed
+1. **Inception**
+   - User Request -> `PROBLEM.md`
+   - Problem Analysis -> `TASKS.md` (Backlog)
+
+2. **Sprint Planning**
+   - User Selects Backlog Items -> `SPRINT_XX.md`
+   - Tasker generates detailed execution steps with Assignees and Verification steps.
+
+3. **Execution Loop**
+   - Orchestrator reads `SPRINT_XX.md`.
+   - Proposes next task to User.
+   - User Confirms.
+   - Subagent executes task.
+   - Verification (Tests/Checks).
+   - Repeat until Sprint is done.
+
+4. **Closure**
+   - Sprint Archived.
+   - User selects new items for next Sprint.
 
 ## Project Structure
 
@@ -126,11 +143,12 @@ When you use these agents, they create and manage the following structure:
 ```
 agent_works/
 ├── PROBLEM.md          # Detailed problem statement
-├── TASKS.md            # Actionable task checklist
-├── DB.md              # Database schema design
-├── FRONTEND.md        # Frontend architecture
-├── API.md             # API specifications
-└── archives/          # Historical project phases
+├── TASKS.md            # Global Project Backlog
+├── SPRINT_01.md        # Active Execution Plan
+├── DB.md               # Database schema design
+├── FRONTEND.md         # Frontend architecture
+├── API.md              # API specifications
+└── archives/           # Historical project phases
     ├── part_1/
     ├── part_2/
     └── ...
